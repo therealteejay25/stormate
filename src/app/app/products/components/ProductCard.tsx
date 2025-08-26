@@ -7,9 +7,10 @@ type CardData = {
     name: string
     price: number
     stock: number
+    onEdit: () => void
 }
 
-const ProductCard = ({name, price, stock}: CardData) => {
+const ProductCard = ({name, price, stock, onEdit}: CardData) => {
   return (
     <div className='bg-white shadow justify-between transition-all duration-300 shadow-gray-100 border border-gray-50 flex items-center gap-3 rounded-xl p-3 px-5'>
         {/* <div className='bg-gray-100 h-16 w-16 flex items-center justify-center rounded-lg'>
@@ -41,7 +42,7 @@ const ProductCard = ({name, price, stock}: CardData) => {
             <Image src='/menu.svg' alt='Menu Icon' height={28}  width={28}/>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={onEdit}>
                     <PenBoxIcon />
                     Edit
                 </DropdownMenuItem>

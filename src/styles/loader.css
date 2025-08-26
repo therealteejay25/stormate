@@ -1,5 +1,5 @@
-svg {
-    width: 3.25em;
+svg.loader {
+    width: 30px;
     transform-origin: center;
     animation: rotate4 2s linear infinite;
    }

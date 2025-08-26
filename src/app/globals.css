@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@font-face {
+  font-family: Inter;
+  src: url("/Inter-VariableFont_opsz,wght.ttf");
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -119,4 +124,8 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+*{
+  font-family: 'Inter', sans-serif;
 }

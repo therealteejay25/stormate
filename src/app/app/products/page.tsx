@@ -7,9 +7,10 @@ import { Product } from "./components/EditModal"
 import ProductCard from "./components/ProductCard"
 import EditModal from "./components/EditModal"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import { Plus } from "lucide-react"
+import { Loader, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import Loader from "@/components/ui/loader"
+import { Input } from "@/components/ui/input"
+// import Loader from "@/components/ui/loader"
 
 const Page = () => {
   const [products, setProducts] = useState<Product[]>([])
@@ -50,6 +51,9 @@ const Page = () => {
     <div>
       <PageHeader text="Your Products." />
       <div className="flex justify-end my-4">
+        <div>
+          <Input placeholder="" />
+        </div>
         <Dialog open={!!editingProduct} onOpenChange={() => setEditingProduct(null)}>
           <DialogTrigger asChild>
             <Button>
@@ -65,8 +69,10 @@ const Page = () => {
       </div>
 
       {isLoading ? (
-        <div className="flex justify-center mt-10">
-          <Loader height={12} />
+        <div className="flex h-[30rem] w-full items-center justify-center">
+          <div className='animate-spin'>
+          <Loader />
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

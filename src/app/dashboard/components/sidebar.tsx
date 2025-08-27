@@ -26,73 +26,51 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-// Menu items.
+
 const items = [
   {
     title: "Dashboard",
-    url: "/",
+    url: "/dashboard/dashboard",
     icon: <SquaresUniteIcon size={24} />,
   },
   {
     title: "Products",
-    url: "/app/products",
+    url: "/dashboard/products",
     icon: <Package size={12} />,
   },
   {
     title: "Analytics",
-    url: "/app/analytics",
+    url: "/dashboard/analytics",
     icon: <BarChart2 size={12} />,
   },
   {
     title: "Credit Customers",
-    url: "/app/credit",
+    url: "/dashboard/credit",
     icon: <CreditCard size={12} />,
   },
   {
     title: "Checkout",
-    url: "/app/checkout",
+    url: "/dashboard/checkout",
     icon: <ShoppingCart size={12} />,
   },
   {
     title: "Settings",
-    url: "/app/settings",
+    url: "/dashboard/settings",
     icon: <Settings size={12} />,
   },
 ];
 
 export function AppSidebar() {
   return (
-    <Sidebar>
-     <SidebarGroupLabel className="text-xl mb-5 mx-2 text-gray-900 mt-3">StorMate</SidebarGroupLabel>
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton className="h-10">
-                  Select Store
-                  <ChevronDown className="ml-auto" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-60">
-                <DropdownMenuItem>
-                  <span>Acme Inc</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <span>Acme Corp.</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
+    <Sidebar className="w-72 h-screen sticky top-0 left-0 bg-gray-50 p-4">
+     <SidebarGroupLabel className="text-2xl mb-5 mx-2 text-gray-900 mt-3">StorMate</SidebarGroupLabel>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton  className="text-md hover:bg-gray-900 transition-all duration-300 hover:text-gray-50 h-10" asChild>
+                  <SidebarMenuButton  className="text-md hover:bg-gray-900 transition-all duration-200 hover:text-gray-50 focus:text-gray-50 hover:bg-black focus:bg-black h-10 text-black bg-gray-50 rounded-lg px-3" asChild>
                     <a href={item.url}>
                       {item.icon}
                       <span>{item.title}</span>

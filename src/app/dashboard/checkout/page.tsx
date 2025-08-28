@@ -212,7 +212,7 @@ export default function CheckoutPage() {
                       }
                     />
                   </TableCell>
-                  <TableCell className="flex items-center gap-3">
+                  <TableCell className="flex items-center mt-2">
                     {product.name}
                   </TableCell>
                   <TableCell>₦{product.selling_price.toLocaleString()}</TableCell>
@@ -230,7 +230,7 @@ export default function CheckoutPage() {
                       <Input
                         type="number"
                         value={product.quantity}
-                        className="w-12 text-center"
+                        className="w-16 text-center"
                         onChange={(e) =>
                           handleQuantityChange(
                             product.id,
@@ -259,7 +259,7 @@ export default function CheckoutPage() {
         </div>
 
         {/* Order Summary */}
-        <div className="bg-muted/30 p-6 rounded-xl shadow-sm">
+        <div className="bg-muted/30 p-6 h-60 rounded-xl shadow-sm">
           <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
           {selectedItems.length === 0 ? (
             <>

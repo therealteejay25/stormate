@@ -135,13 +135,13 @@ export default function CreditsPage() {
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
             />
             <Input
-              type="number"
+              type="text"
               placeholder="Total"
               value={form.total || ""}
               onChange={(e) => setForm({ ...form, total: Number(e.target.value) })}
             />
             <Input
-              type="number"
+              type="text"
               placeholder="Amount Paid"
               value={form.amount_paid || ""}
               onChange={(e) => setForm({ ...form, amount_paid: Number(e.target.value) })}

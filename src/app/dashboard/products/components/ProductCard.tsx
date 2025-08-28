@@ -8,9 +8,10 @@ type CardData = {
     price: number
     stock: number
     onEdit: () => void
+    handleDelete: () => void
 }
 
-const ProductCard = ({name, price, stock, onEdit}: CardData) => {
+const ProductCard = ({name, price, stock, onEdit, handleDelete}: CardData) => {
   return (
     <div className='bg-white shadow justify-between transition-all duration-300 shadow-gray-100 border border-gray-50 flex items-center gap-3 rounded-xl p-3 px-5'>
         {/* <div className='bg-gray-100 h-16 w-16 flex items-center justify-center rounded-lg'>
@@ -46,7 +47,7 @@ const ProductCard = ({name, price, stock, onEdit}: CardData) => {
                     <PenBoxIcon />
                     Edit
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={handleDelete}>
                     <TrashIcon/>
                     Delete
                 </DropdownMenuItem>

@@ -16,6 +16,8 @@ import {
 import { Download, FileText } from "lucide-react";
 import { supabase } from "@/lib/client";
 import jsPDF from "jspdf";
+import Link from "next/link";
+import { withAuth } from "@/hooks/useAuth";
 
 interface Product {
   id: string;
@@ -28,7 +30,7 @@ interface SelectedProduct extends Product {
   selected: boolean;
 }
 
-export default function CheckoutPage() {
+const CheckoutPage = () => {
   const [products, setProducts] = useState<SelectedProduct[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
@@ -83,6 +85,29 @@ export default function CheckoutPage() {
   );
   const shipping = selectedItems.length > 0 ? 5.0 : 0;
   const total = subtotal + shipping;
+
+  // ✅ Save sales to DB
+  const handleConfirmOrder = async () => {
+    if (selectedItems.length === 0) return;
+
+    const rows = selectedItems.map((item) => ({
+      product_id: item.id,
+      quantity: item.quantity,
+      total_amount: item.selling_price * item.quantity,
+    }));
+
+    const { error } = await supabase.from("sales").insert(rows);
+
+    if (error) {
+      console.error("Error saving sales:", error);
+      alert("Failed to save order.");
+    } else {
+      alert("Order saved successfully!");
+      setProducts((prev) =>
+        prev.map((p) => ({ ...p, selected: false, quantity: 1 }))
+      );
+    }
+  };
 
   const handleDownloadCSV = () => {
     const headers = ["Product Name", "Quantity", "Price", "Total"];
@@ -153,7 +178,6 @@ export default function CheckoutPage() {
   return (
     <div className="min-h-screen py-12 px-6 lg:px-12">
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
-        
         {/* Product List */}
         <div className="md:col-span-2 border border-gray-100 rounded-xl p-6 shadow-sm h-50vh overflow-y-auto relative">
           <h1 className="text-2xl font-semibold mb-6">Select Products</h1>
@@ -259,22 +283,12 @@ export default function CheckoutPage() {
         </div>
 
         {/* Order Summary */}
-        <div className="bg-muted/30 p-6 h-60 rounded-xl shadow-sm">
-          <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
-          {selectedItems.length === 0 ? (
-            <>
+        <div className="bg-muted/30 p-6 h-60 rounded-xl shadow-sm flex flex-col justify-between">
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
+            {selectedItems.length === 0 ? (
               <p className="text-muted-foreground">No products selected</p>
-              <div className="flex flex-col gap-2 mt-6">
-                <Button variant="outline" onClick={handleDownloadCSV} className="hover:bg-black hover:text-white">
-                  <Download className="mr-2 h-4 w-4" /> Download as CSV
-                </Button>
-                <Button variant="outline" onClick={handleDownloadPDF} className="hover:bg-black hover:text-white">
-                  <FileText className="mr-2 h-4 w-4" /> Download Invoice
-                </Button>
-              </div>
-            </>
-          ) : (
-            <>
+            ) : (
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
@@ -290,18 +304,33 @@ export default function CheckoutPage() {
                   <span>₦{total.toLocaleString()}</span>
                 </div>
               </div>
-              <div className="flex flex-col gap-2 mt-6">
-                <Button variant="outline" onClick={handleDownloadCSV} className="hover:bg-black hover:text-white">
-                  <Download className="mr-2 h-4 w-4" /> Download as CSV
-                </Button>
-                <Button variant="outline" onClick={handleDownloadPDF} className="hover:bg-black hover:text-white">
-                  <FileText className="mr-2 h-4 w-4" /> Download Invoice
-                </Button>
-              </div>
-            </>
-          )}
+            )}
+          </div>
+
+          {/* Buttons */}
+          <div className="flex flex-col gap-2 mt-6">
+            <Button
+              className="bg-black text-white hover:bg-gray-800"
+              onClick={handleConfirmOrder}
+            >
+              Confirm Order
+            </Button>
+            <Button variant="outline" onClick={handleDownloadCSV}>
+              <Download className="mr-2 h-4 w-4" /> Download as CSV
+            </Button>
+            <Button variant="outline" onClick={handleDownloadPDF}>
+              <FileText className="mr-2 h-4 w-4" /> Download Invoice
+            </Button>
+            {/* ✅ View sales link */}
+            <Link href="/sales">
+              <Button variant="secondary" className="w-full">
+                View Sales
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     </div>
   );
 }
+ export default withAuth(CheckoutPage)

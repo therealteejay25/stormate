@@ -11,8 +11,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { withAuth } from '@/hooks/useAuth';
 
-export default function SettingsPage() {
+const SettingsPage = () => {
   const [stores, setStores] = useState<Store[]>([]);
   const [storeId, setStoreId] = useState<string | null>(null);
   const [settings, setSettings] = useState<Partial<StoreSettings>>({});
@@ -141,3 +142,7 @@ export default function SettingsPage() {
     </div>
   );
 }
+
+
+
+export default withAuth(SettingsPage)

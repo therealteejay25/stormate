@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/client";
 import { Loader2, Plus, Edit2, Trash2 } from "lucide-react";
+import { withAuth } from "@/hooks/useAuth";
 import {
   Table,
   TableBody,
@@ -28,7 +29,7 @@ interface Credit {
   notes: string | null;
 }
 
-export default function CreditsPage() {
+const CreditsPage = () => {
   const [credits, setCredits] = useState<Credit[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [editingCredit, setEditingCredit] = useState<Credit | null>(null);
@@ -225,3 +226,6 @@ export default function CreditsPage() {
     </div>
   );
 }
+
+
+export default withAuth(CreditsPage)

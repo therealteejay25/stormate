@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react"
 import PageHeader from "../components/page-header"
 import { supabase } from "@/lib/client"
 import { Product } from "./components/EditModal"
+import { withAuth } from "@/hooks/useAuth"
 import ProductCard from "./components/ProductCard"
 import EditModal from "./components/EditModal"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
@@ -24,7 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-const Page = () => {
+const Page = ({ session }: { session: any }) => {
   const [products, setProducts] = useState<Product[]>([])
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -42,16 +43,16 @@ const Page = () => {
     const fetchProducts = async () => {
       setIsLoading(true)
       setErrorMessage("")
-      const { data, error } = await supabase.from("products").select("*")
-      if (error) {
-        setErrorMessage(error.message)
-      } else if (Array.isArray(data)) {
-        setProducts(data as Product[])
-      }
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("created_by", session.user.id) // only own products
+      if (error) setErrorMessage(error.message)
+      else if (Array.isArray(data)) setProducts(data as Product[])
       setIsLoading(false)
     }
-    fetchProducts()
-  }, [])
+    if (session) fetchProducts()
+  }, [session])
 
   const showMessage = (type: "error" | "success", message: string) => {
     if (type === "error") {
@@ -66,9 +67,8 @@ const Page = () => {
   const handleDelete = async (id: string) => {
     setIsDeleting(id)
     const { error } = await supabase.from("products").delete().eq("id", id)
-    if (error) {
-      showMessage("error", error.message)
-    } else {
+    if (error) showMessage("error", error.message)
+    else {
       setProducts((prev) => prev.filter((p) => p.id !== id))
       showMessage("success", "Product deleted successfully.")
     }
@@ -77,8 +77,9 @@ const Page = () => {
 
   const handleSave = async (updated: Product) => {
     setIsSaving(true)
+
     if (!updated.id) {
-      // INSERT new product
+      // INSERT new product with created_by
       const { data, error } = await supabase
         .from("products")
         .insert({
@@ -86,12 +87,12 @@ const Page = () => {
           stock: updated.stock,
           cost_price: updated.cost_price,
           selling_price: updated.selling_price,
+          created_by: session.user.id,
         })
         .select()
 
-      if (error) {
-        showMessage("error", error.message)
-      } else if (data && data.length > 0) {
+      if (error) showMessage("error", error.message)
+      else if (data && data.length > 0) {
         setProducts((prev) => [...prev, data[0]])
         showMessage("success", "Product added successfully!")
         setEditingProduct(null)
@@ -107,11 +108,11 @@ const Page = () => {
           selling_price: updated.selling_price,
         })
         .eq("id", updated.id)
+        .eq("created_by", session.user.id) // enforce ownership
         .select()
 
-      if (error) {
-        showMessage("error", error.message)
-      } else if (data && data.length > 0) {
+      if (error) showMessage("error", error.message)
+      else if (data && data.length > 0) {
         setProducts((prev) =>
           prev.map((p) => (p.id === updated.id ? data[0] : p))
         )
@@ -137,11 +138,11 @@ const Page = () => {
       .from("products")
       .update({ stock: updatedStock })
       .eq("id", selectedProductId)
+      .eq("created_by", session.user.id)
       .select()
 
-    if (error) {
-      showMessage("error", error.message)
-    } else if (data && data.length > 0) {
+    if (error) showMessage("error", error.message)
+    else if (data && data.length > 0) {
       setProducts((prev) =>
         prev.map((p) => (p.id === selectedProductId ? data[0] : p))
       )
@@ -158,7 +159,6 @@ const Page = () => {
     <div>
       <PageHeader text="Your Products." />
 
-      {/* Feedback messages */}
       {errorMessage && (
         <div className="mb-4 p-3 rounded bg-red-100 text-red-700 text-sm">
           {errorMessage}
@@ -171,17 +171,13 @@ const Page = () => {
       )}
 
       <div className="flex justify-between my-4">
-        <div>
-          <Input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search products..."
-            className="mb-4 w-2xl"
-          />
-        </div>
-
-        {/* Dropdown for New / Existing */}
+        <Input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search products..."
+          className="mb-4 w-2xl"
+        />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button>
@@ -213,7 +209,11 @@ const Page = () => {
       <Dialog open={!!editingProduct} onOpenChange={() => setEditingProduct(null)}>
         <DialogContent>
           {editingProduct && (
-            <EditModal product={editingProduct} onSave={handleSave} isSaving={isSaving} />
+            <EditModal
+              product={editingProduct}
+              onSave={handleSave}
+              isSaving={isSaving}
+            />
           )}
         </DialogContent>
       </Dialog>
@@ -283,4 +283,4 @@ const Page = () => {
   )
 }
 
-export default Page
+export default withAuth(Page)

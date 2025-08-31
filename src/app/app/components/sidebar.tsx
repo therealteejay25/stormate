@@ -30,32 +30,32 @@ import {
 const items = [
   {
     title: "Dashboard",
-    url: "/dashboard/dashboard",
+    url: "/app/dashboard",
     icon: <SquaresUniteIcon size={24} />,
   },
   {
     title: "Products",
-    url: "/dashboard/products",
+    url: "/app/products",
     icon: <Package size={12} />,
   },
   {
-    title: "Analytics",
-    url: "/dashboard/analytics",
+    title: "Sales",
+    url: "/app/sales",
     icon: <BarChart2 size={12} />,
   },
   {
     title: "Credit Customers",
-    url: "/dashboard/credit",
+    url: "/app/credit",
     icon: <CreditCard size={12} />,
   },
   {
     title: "Checkout",
-    url: "/dashboard/checkout",
+    url: "/app/checkout",
     icon: <ShoppingCart size={12} />,
   },
   {
     title: "Settings",
-    url: "/dashboard/settings",
+    url: "/app/settings",
     icon: <Settings size={12} />,
   },
 ];

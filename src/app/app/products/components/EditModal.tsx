@@ -14,7 +14,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { ProductSchema } from "@/lib/validations/ProductSchema"
+import { ProductSchema, ProductFormValues } from "@/lib/validations/ProductSchema"
 
 export interface Product {
   id: string
@@ -30,17 +30,17 @@ interface EditModalProps {
 }
 
 const EditModal = ({ product, onSave }: EditModalProps) => {
-  const form = useForm<z.infer<typeof ProductSchema>>({
+  const form = useForm<ProductFormValues>({
     resolver: zodResolver(ProductSchema),
     defaultValues: {
       name: product.name,
-      costPrice: product.cost_price,
-      sellingPrice: product.selling_price,
-      stock: product.stock,
+      costPrice: Number(product.cost_price),
+      sellingPrice: Number(product.selling_price),
+      stock: Number(product.stock),
     },
   })
 
-  const submit = (data: z.infer<typeof ProductSchema>) => {
+  const submit = (data: ProductFormValues) => {
     onSave({
       ...product,
       name: data.name,
@@ -54,7 +54,7 @@ const EditModal = ({ product, onSave }: EditModalProps) => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(submit)} className="space-y-4">
         <FormField
-          control={form.control as any}
+          control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem>
@@ -67,7 +67,7 @@ const EditModal = ({ product, onSave }: EditModalProps) => {
           )}
         />
         <FormField
-          control={form.control as any}
+          control={form.control}
           name="costPrice"
           render={({ field }) => (
             <FormItem>
@@ -80,7 +80,7 @@ const EditModal = ({ product, onSave }: EditModalProps) => {
           )}
         />
         <FormField
-          control={form.control as any}
+          control={form.control}
           name="sellingPrice"
           render={({ field }) => (
             <FormItem>
@@ -93,7 +93,7 @@ const EditModal = ({ product, onSave }: EditModalProps) => {
           )}
         />
         <FormField
-          control={form.control as any}
+          control={form.control}
           name="stock"
           render={({ field }) => (
             <FormItem>

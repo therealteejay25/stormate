@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-const Page = ({ session }: { session: any }) => {
+const Page = () => {
   const [products, setProducts] = useState<Product[]>([])
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -38,21 +38,43 @@ const Page = ({ session }: { session: any }) => {
   const [isAddingStock, setIsAddingStock] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string>("")
   const [successMessage, setSuccessMessage] = useState<string>("")
+  const [userId, setUserId] = useState<string | null>(null)
 
+  // Fetch session + products
   useEffect(() => {
     const fetchProducts = async () => {
       setIsLoading(true)
       setErrorMessage("")
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .eq("created_by", session.user.id) // only own products
-      if (error) setErrorMessage(error.message)
-      else if (Array.isArray(data)) setProducts(data as Product[])
-      setIsLoading(false)
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        if (sessionError) throw sessionError
+
+        if (!session?.user?.id) {
+          setUserId(null)
+          setProducts([])
+          return
+        }
+
+        setUserId(session.user.id)
+
+        const { data, error } = await supabase
+          .from("products")
+          .select("*")
+          .eq("created_by", session.user.id)
+
+        if (error) throw error
+        setProducts(data || [])
+      } catch (err: any) {
+        console.error("Fetch error:", err)
+        setErrorMessage(err.message || "Something went wrong.")
+        setProducts([])
+      } finally {
+        setIsLoading(false)
+      }
     }
-    if (session) fetchProducts()
-  }, [session])
+
+    fetchProducts()
+  }, [])
 
   const showMessage = (type: "error" | "success", message: string) => {
     if (type === "error") {
@@ -76,10 +98,11 @@ const Page = ({ session }: { session: any }) => {
   }
 
   const handleSave = async (updated: Product) => {
+    if (!userId) return
     setIsSaving(true)
 
     if (!updated.id) {
-      // INSERT new product with created_by
+      // INSERT new product
       const { data, error } = await supabase
         .from("products")
         .insert({
@@ -87,7 +110,7 @@ const Page = ({ session }: { session: any }) => {
           stock: updated.stock,
           cost_price: updated.cost_price,
           selling_price: updated.selling_price,
-          created_by: session.user.id,
+          created_by: userId,
         })
         .select()
 
@@ -108,7 +131,7 @@ const Page = ({ session }: { session: any }) => {
           selling_price: updated.selling_price,
         })
         .eq("id", updated.id)
-        .eq("created_by", session.user.id) // enforce ownership
+        .eq("created_by", userId)
         .select()
 
       if (error) showMessage("error", error.message)
@@ -124,7 +147,7 @@ const Page = ({ session }: { session: any }) => {
   }
 
   const handleAddStock = async () => {
-    if (!selectedProductId || newStock <= 0) {
+    if (!userId || !selectedProductId || newStock <= 0) {
       showMessage("error", "Select a product and enter stock > 0")
       return
     }
@@ -138,7 +161,7 @@ const Page = ({ session }: { session: any }) => {
       .from("products")
       .update({ stock: updatedStock })
       .eq("id", selectedProductId)
-      .eq("created_by", session.user.id)
+      .eq("created_by", userId)
       .select()
 
     if (error) showMessage("error", error.message)

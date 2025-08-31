@@ -98,10 +98,11 @@ const CheckoutPage = () => {
 
     const { error } = await supabase.from("sales").insert(rows);
 
-    if (error) {
-      console.error("Error saving sales:", error);
-      alert("Failed to save order.");
-    } else {
+if (error) {
+  console.error("Error saving sales:", error.message, error.details);
+  alert(`Failed to save order: ${error.message}`);
+}
+ else {
       alert("Order saved successfully!");
       setProducts((prev) =>
         prev.map((p) => ({ ...p, selected: false, quantity: 1 }))
@@ -322,7 +323,7 @@ const CheckoutPage = () => {
               <FileText className="mr-2 h-4 w-4" /> Download Invoice
             </Button>
             {/* ✅ View sales link */}
-            <Link href="/sales">
+            <Link href="/app/sales">
               <Button variant="secondary" className="w-full">
                 View Sales
               </Button>

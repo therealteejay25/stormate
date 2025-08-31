@@ -5,7 +5,10 @@ import { ThemeProvider } from "@/components/theme-provider"
 
 export const metadata: Metadata = {
   title: "StorMate",
-  description: "Next Gen stores Around the World",
+  description: "Next Gen stores Manager",
+   icons: {
+    icon: "/_.jpeg",
+  },
 };
 
 export default function RootLayout({

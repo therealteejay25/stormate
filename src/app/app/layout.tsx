@@ -4,8 +4,11 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "./components/sidebar"
 
 export const metadata: Metadata = {
-  title: "Storemate Dashboard",
+  title: "Stormate Dashboard",
   description: "Storemate admin dashboard",
+   icons: {
+    icon: "/_.jpeg",
+  },
 };
 
 export default function RootLayout({

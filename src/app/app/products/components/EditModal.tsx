@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { ProductSchema } from "@/lib/validations/ProductSchema"
+import { useSession } from "next-auth/react"
 
 export interface Product {
   id: string
@@ -26,10 +27,12 @@ export interface Product {
 
 interface EditModalProps {
   product: Product
-  onSave: (updated: Product) => void
+  onSave: (updated: Product & { created_by: string }) => void
 }
 
 const EditModal = ({ product, onSave }: EditModalProps) => {
+  const { data: session } = useSession()
+
   const form = useForm<z.infer<typeof ProductSchema>>({
     resolver: zodResolver(ProductSchema),
     defaultValues: {
@@ -41,12 +44,18 @@ const EditModal = ({ product, onSave }: EditModalProps) => {
   })
 
   const submit = (data: z.infer<typeof ProductSchema>) => {
+    if (!session?.user?.id) {
+      console.error("No user logged in")
+      return
+    }
+
     onSave({
       ...product,
       name: data.name,
       cost_price: data.costPrice,
       selling_price: data.sellingPrice,
       stock: data.stock,
+      created_by: session.user.id, // ✅ now always safe
     })
   }
 
@@ -54,7 +63,7 @@ const EditModal = ({ product, onSave }: EditModalProps) => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(submit)} className="space-y-4">
         <FormField
-          control={form.control as any}
+          control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem>
@@ -67,7 +76,7 @@ const EditModal = ({ product, onSave }: EditModalProps) => {
           )}
         />
         <FormField
-          control={form.control as any}
+          control={form.control}
           name="costPrice"
           render={({ field }) => (
             <FormItem>
@@ -80,7 +89,7 @@ const EditModal = ({ product, onSave }: EditModalProps) => {
           )}
         />
         <FormField
-          control={form.control as any}
+          control={form.control}
           name="sellingPrice"
           render={({ field }) => (
             <FormItem>
@@ -93,7 +102,7 @@ const EditModal = ({ product, onSave }: EditModalProps) => {
           )}
         />
         <FormField
-          control={form.control as any}
+          control={form.control}
           name="stock"
           render={({ field }) => (
             <FormItem>

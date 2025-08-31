@@ -1,5 +1,8 @@
 'use client';
 import React, { useEffect, useState } from 'react';
+import Image from "next/image"
+
+{/*
 import { supabase } from "@/lib/client"
 import { fetchSettings, fetchStoresForUser, upsertSettings } from '@/lib/settings';
 import { uploadLogo } from '@/lib/storage';
@@ -12,7 +15,8 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { withAuth } from '@/hooks/useAuth';
-
+*/}
+{/*
 const SettingsPage = () => {
   const [stores, setStores] = useState<Store[]>([]);
   const [storeId, setStoreId] = useState<string | null>(null);
@@ -81,10 +85,12 @@ const SettingsPage = () => {
     }
   }
 
-  if (loading) return <div>Loading…</div>;
+  if (loading) return <div>Loading…</div>; 
 
   return (
-    <div className="space-y-6 p-6">
+
+
+  <div className="space-y-6 p-6">
       <h1 className="text-2xl font-semibold">Store Settings</h1>
 
       <div>
@@ -140,9 +146,34 @@ const SettingsPage = () => {
         <Button onClick={handleSave} disabled={saving}>{saving ? 'Saving…' : 'Save changes'}</Button>
       </div>
     </div>
+    
+    
+   
+
+
   );
 }
 
 
-
 export default withAuth(SettingsPage)
+*/}
+
+
+
+
+
+const SettingsPage = () => {
+  return (
+     <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
+      <Image
+        src="/storemate.jpg"
+        alt="Cart Icon"
+        width={100}   // ✅ must be a number
+        height={100}  // ✅ must be a number
+      />
+      <h1 className="text-4xl font-bold text-gray-700">🚀 Coming Soon......</h1>
+    </div>
+  );
+};
+
+export default SettingsPage;

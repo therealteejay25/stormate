@@ -14,7 +14,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { ProductSchema, ProductFormValues } from "@/lib/validations/ProductSchema"
+import { ProductSchema } from "@/lib/validations/ProductSchema"
 
 export interface Product {
   id: string
@@ -26,11 +26,11 @@ export interface Product {
 
 interface EditModalProps {
   product: Product
-  onSave: (updated: Product) => void
+  onSave: (updated: Product & { created_by: string }) => void
 }
 
 const EditModal = ({ product, onSave }: EditModalProps) => {
-  const form = useForm<ProductFormValues>({
+  const form = useForm<z.infer<typeof ProductSchema>>({
     resolver: zodResolver(ProductSchema),
     defaultValues: {
       name: product.name,
@@ -40,13 +40,14 @@ const EditModal = ({ product, onSave }: EditModalProps) => {
     },
   })
 
-  const submit = (data: ProductFormValues) => {
+  const submit = (data: z.infer<typeof ProductSchema>) => {
     onSave({
       ...product,
       name: data.name,
       cost_price: data.costPrice,
       selling_price: data.sellingPrice,
       stock: data.stock,
+      created_by: session.user.id, // ✅ now always safe
     })
   }
 

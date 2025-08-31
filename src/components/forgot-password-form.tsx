@@ -3,6 +3,7 @@
 import { cn } from '@/lib/utils'
 import { supabase } from '@/lib/client'
 import { Button } from '@/components/ui/button'
+
 import {
   Card,
   CardContent,
@@ -23,7 +24,6 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault()
-    const supabase = createClient()
     setIsLoading(true)
     setError(null)
 

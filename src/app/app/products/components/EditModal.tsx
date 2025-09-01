@@ -4,7 +4,6 @@ import React from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
-import { z } from "zod"
 import {
   Form,
   FormField,
@@ -14,7 +13,8 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { ProductSchema, ProductFormValues } from "@/lib/validations/ProductSchema"
+import { ProductSchema } from "@/lib/validations/ProductSchema"
+import { z } from "zod"
 
 export interface Product {
   id: string
@@ -28,6 +28,9 @@ interface EditModalProps {
   product: Product
   onSave: (updated: Product) => void
 }
+
+// infer types directly from schema
+type ProductFormValues = z.infer<typeof ProductSchema>
 
 const EditModal = ({ product, onSave }: EditModalProps) => {
   const form = useForm<ProductFormValues>({

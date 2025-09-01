@@ -1,116 +1,78 @@
 "use client"
 
-import React from "react"
-import { useForm } from "react-hook-form"
+import React, { useState } from "react"
+import { DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-} from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 
 export interface Product {
-  id: string
+  id?: string
   name: string
   stock: number
   cost_price: number
   selling_price: number
 }
 
-interface EditModalProps {
+export interface EditModalProps {
   product: Product
-  onSave: (updated: Product) => void
+  onSave: (updated: Product) => Promise<void>
+  isSaving: boolean
 }
 
-type ProductFormValues = {
-  name: string
-  costPrice: number
-  sellingPrice: number
-  stock: number
-}
+const EditModal: React.FC<EditModalProps> = ({ product, onSave, isSaving }) => {
+  const [form, setForm] = useState<Product>(product)
 
-const EditModal = ({ product, onSave }: EditModalProps) => {
-  const form = useForm<ProductFormValues>({
-    defaultValues: {
-      name: product.name,
-      costPrice: product.cost_price,
-      sellingPrice: product.selling_price,
-      stock: product.stock,
-    },
-  })
+  const handleChange = (field: keyof Product, value: any) => {
+    setForm((prev) => ({ ...prev, [field]: value }))
+  }
 
-  const submit = (data: ProductFormValues) => {
-    onSave({
-      ...product,
-      name: data.name,
-      cost_price: Number(data.costPrice),
-      selling_price: Number(data.sellingPrice),
-      stock: Number(data.stock),
-    })
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    await onSave(form)
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(submit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Product Name</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+    <div>
+      <DialogHeader>
+        <DialogTitle>
+          {form.id ? "Edit Product" : "Add New Product"}
+        </DialogTitle>
+      </DialogHeader>
+
+      <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+        <Input
+          type="text"
+          placeholder="Product name"
+          value={form.name}
+          onChange={(e) => handleChange("name", e.target.value)}
         />
-        <FormField
-          control={form.control}
-          name="costPrice"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Cost Price</FormLabel>
-              <FormControl>
-                <Input type="number" {...field} onChange={e => field.onChange(Number(e.target.value))} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+
+        <Input
+          type="number"
+          placeholder="Cost price"
+          value={form.cost_price}
+          onChange={(e) => handleChange("cost_price", Number(e.target.value))}
         />
-        <FormField
-          control={form.control}
-          name="sellingPrice"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Selling Price</FormLabel>
-              <FormControl>
-                <Input type="number" {...field} onChange={e => field.onChange(Number(e.target.value))} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+
+        <Input
+          type="number"
+          placeholder="Selling price"
+          value={form.selling_price}
+          onChange={(e) => handleChange("selling_price", Number(e.target.value))}
         />
-        <FormField
-          control={form.control}
-          name="stock"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Stock</FormLabel>
-              <FormControl>
-                <Input type="number" {...field} onChange={e => field.onChange(Number(e.target.value))} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+
+        <Input
+          type="number"
+          placeholder="Stock"
+          value={form.stock}
+          onChange={(e) => handleChange("stock", Number(e.target.value))}
         />
-        <Button type="submit">Save</Button>
+
+        <Button type="submit" disabled={isSaving} className="w-full">
+          {isSaving ? "Saving..." : "Save"}
+        </Button>
       </form>
-    </Form>
+    </div>
   )
 }
 

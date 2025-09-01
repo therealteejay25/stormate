@@ -299,8 +299,7 @@ const Page = () => {
                 price={product.selling_price}
                 stock={product.stock}
                 onEdit={() => setEditingProduct(product)}
-                handleDelete={() => handleDelete(product.id)}
-                isDeleting={isDeleting === product.id}
+                handleDelete={() => handleDelete(product.id!)}
               />
             ))}
         </div>

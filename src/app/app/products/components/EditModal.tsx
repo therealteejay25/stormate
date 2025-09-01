@@ -2,7 +2,6 @@
 
 import React from "react"
 import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -13,8 +12,6 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { ProductSchema } from "@/lib/validations/ProductSchema"
-import { z } from "zod"
 
 export interface Product {
   id: string
@@ -29,17 +26,20 @@ interface EditModalProps {
   onSave: (updated: Product) => void
 }
 
-// infer types directly from schema
-type ProductFormValues = z.infer<typeof ProductSchema>
+type ProductFormValues = {
+  name: string
+  costPrice: number
+  sellingPrice: number
+  stock: number
+}
 
 const EditModal = ({ product, onSave }: EditModalProps) => {
   const form = useForm<ProductFormValues>({
-    resolver: zodResolver(ProductSchema),
     defaultValues: {
       name: product.name,
-      costPrice: Number(product.cost_price),
-      sellingPrice: Number(product.selling_price),
-      stock: Number(product.stock),
+      costPrice: product.cost_price,
+      sellingPrice: product.selling_price,
+      stock: product.stock,
     },
   })
 
@@ -47,9 +47,9 @@ const EditModal = ({ product, onSave }: EditModalProps) => {
     onSave({
       ...product,
       name: data.name,
-      cost_price: data.costPrice,
-      selling_price: data.sellingPrice,
-      stock: data.stock,
+      cost_price: Number(data.costPrice),
+      selling_price: Number(data.sellingPrice),
+      stock: Number(data.stock),
     })
   }
 
@@ -76,7 +76,7 @@ const EditModal = ({ product, onSave }: EditModalProps) => {
             <FormItem>
               <FormLabel>Cost Price</FormLabel>
               <FormControl>
-                <Input type="number" {...field} />
+                <Input type="number" {...field} onChange={e => field.onChange(Number(e.target.value))} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -89,7 +89,7 @@ const EditModal = ({ product, onSave }: EditModalProps) => {
             <FormItem>
               <FormLabel>Selling Price</FormLabel>
               <FormControl>
-                <Input type="number" {...field} />
+                <Input type="number" {...field} onChange={e => field.onChange(Number(e.target.value))} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -102,7 +102,7 @@ const EditModal = ({ product, onSave }: EditModalProps) => {
             <FormItem>
               <FormLabel>Stock</FormLabel>
               <FormControl>
-                <Input type="number" {...field} />
+                <Input type="number" {...field} onChange={e => field.onChange(Number(e.target.value))} />
               </FormControl>
               <FormMessage />
             </FormItem>

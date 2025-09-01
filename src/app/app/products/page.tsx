@@ -252,12 +252,15 @@ const Page = () => {
               <SelectValue placeholder="Select product" />
             </SelectTrigger>
             <SelectContent>
-              {products.map((p) => (
-                <SelectItem key={p.id} value={p.id}>
-                  {p.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
+  {products
+    .filter((p): p is Product & { id: string } => !!p.id) // type guard
+    .map((p) => (
+      <SelectItem key={p.id} value={p.id}>
+        {p.name}
+      </SelectItem>
+    ))}
+</SelectContent>
+
           </Select>
 
           <Input

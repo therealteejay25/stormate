@@ -2,26 +2,20 @@
 
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/client"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Separator } from "@/components/ui/separator"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { withAuth } from "@/hooks/useAuth"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
+
+interface Product {
+  id: string
+  name: string
+}
 
 interface Sale {
   id: string
-  product: { name: string } | null
+  product: Product
   quantity: number
   total_amount: number
   created_at: string
@@ -29,26 +23,29 @@ interface Sale {
 
 const SalesPage = () => {
   const [sales, setSales] = useState<Sale[]>([])
+  const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetchSales() {
       setLoading(true)
-      const { data, error } = await supabase
+
+      const { data: salesData, error: salesError } = await supabase
         .from("sales")
-        .select(
-          "id, quantity, total_amount, created_at, product:product_id(name)"
-        )
+        .select("id, quantity, total_amount, created_at, product:product_id(id, name)")
         .order("created_at", { ascending: false })
 
-      if (error) {
-        console.error("Error fetching sales:", error)
-        setSales([])
-      } else if (data) {
-        setSales(data as unknown as Sale[])
-      }
+      if (!salesError && salesData) setSales(salesData as Sale[])
+
+      const { data: productData, error: productError } = await supabase
+        .from("products")
+        .select("id, name")
+
+      if (!productError && productData) setProducts(productData as Product[])
+
       setLoading(false)
     }
+
     fetchSales()
   }, [])
 
@@ -65,6 +62,25 @@ const SalesPage = () => {
   return (
     <div className="max-w-5xl mx-auto py-12 px-6">
       <h1 className="text-2xl font-bold mb-8">Sales Report</h1>
+
+      {/* Product Select Dropdown */}
+      <div className="mb-6">
+        <Select>
+          <SelectTrigger>
+            <SelectValue placeholder="Select a product" />
+          </SelectTrigger>
+          <SelectContent>
+            {products
+              .filter((p) => p.id) // ignore undefined
+              .map((p) => (
+                <SelectItem key={p.id!} value={p.id!}>
+                  {p.name}
+                </SelectItem>
+              ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       {Object.keys(grouped).map((date) => (
         <Card key={date} className="mb-6">
           <CardHeader>
@@ -83,16 +99,11 @@ const SalesPage = () => {
               <TableBody>
                 {grouped[date].map((sale) => (
                   <TableRow key={sale.id}>
-                    <TableCell>{sale.product?.name ?? "—"}</TableCell>
+                    <TableCell>{sale.product?.name}</TableCell>
                     <TableCell>{sale.quantity}</TableCell>
+                    <TableCell>₦{sale.total_amount.toLocaleString()}</TableCell>
                     <TableCell>
-                      ₦{sale.total_amount.toLocaleString()}
-                    </TableCell>
-                    <TableCell>
-                      {new Date(sale.created_at).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                      {new Date(sale.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                     </TableCell>
                   </TableRow>
                 ))}

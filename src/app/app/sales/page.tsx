@@ -2,14 +2,26 @@
 
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/client"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import { Separator } from "@/components/ui/separator"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { withAuth } from "@/hooks/useAuth"
 
 interface Sale {
   id: string
-  product: { name: string }
+  product: { name: string } | null
   quantity: number
   total_amount: number
   created_at: string
@@ -24,10 +36,17 @@ const SalesPage = () => {
       setLoading(true)
       const { data, error } = await supabase
         .from("sales")
-        .select("id, quantity, total_amount, created_at, product:product_id(name)")
+        .select(
+          "id, quantity, total_amount, created_at, product:product_id(name)"
+        )
         .order("created_at", { ascending: false })
 
-      if (!error && data) setSales(data as Sale[])
+      if (error) {
+        console.error("Error fetching sales:", error)
+        setSales([])
+      } else if (data) {
+        setSales(data as unknown as Sale[])
+      }
       setLoading(false)
     }
     fetchSales()
@@ -64,11 +83,16 @@ const SalesPage = () => {
               <TableBody>
                 {grouped[date].map((sale) => (
                   <TableRow key={sale.id}>
-                    <TableCell>{sale.product?.name}</TableCell>
+                    <TableCell>{sale.product?.name ?? "—"}</TableCell>
                     <TableCell>{sale.quantity}</TableCell>
-                    <TableCell>₦{sale.total_amount.toLocaleString()}</TableCell>
                     <TableCell>
-                      {new Date(sale.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      ₦{sale.total_amount.toLocaleString()}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(sale.created_at).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </TableCell>
                   </TableRow>
                 ))}

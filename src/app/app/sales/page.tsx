@@ -35,7 +35,18 @@ const SalesPage = () => {
         .select("id, quantity, total_amount, created_at, product:product_id(id, name)")
         .order("created_at", { ascending: false })
 
-      if (!salesError && salesData) setSales(salesData as Sale[])
+      if (!salesError && salesData) {
+        // salesData is: { id, quantity, total_amount, created_at, product: [{ id, name }] }[]
+        // We need to map product: [{id, name}] to product: {id, name}
+        const normalizedSales: Sale[] = (salesData as any[]).map((sale) => ({
+          id: sale.id,
+          quantity: sale.quantity,
+          total_amount: sale.total_amount,
+          created_at: sale.created_at,
+          product: Array.isArray(sale.product) ? sale.product[0] : sale.product,
+        }))
+        setSales(normalizedSales)
+      }
 
       const { data: productData, error: productError } = await supabase
         .from("products")

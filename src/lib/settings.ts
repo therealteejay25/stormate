@@ -1,6 +1,6 @@
 // lib/settings.ts
 import { supabase } from './client';
-import type { StoreSettings } from '@/types';
+import type { StoreSettings } from './types';
 
 export async function fetchStoresForUser() {
   const user = (await supabase.auth.getUser()).data.user;
